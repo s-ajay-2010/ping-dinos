@@ -17,7 +17,7 @@ app.command("/ping-dinos", async ({command, ack}) => {
     await ack();
     const res = await client.chat.postMessage({
         channel: command.channel_id,
-        text: `react with :${EMOJI}: to get added to this channel!`,
+        text: `Heyy gng!!, react with :${EMOJI}: to get added to my private channel(I maay. MAY. yap.):)`,
     });
     invitePosts.add(res.ts);
 });
