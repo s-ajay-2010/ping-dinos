@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const{App} = require("@slack/bolt");
+const {App} = require("@slack/bolt");
 const {WebClient} = require("@slack/web-api");
 
 const app = new App({
@@ -8,24 +8,31 @@ const app = new App({
     appToken: process.env.SLACK_APP_TOKEN,
     socketMode: true,
 });
+const client = new WebClient(process.env.SLACK_BOT_TOKEN);
 
-const client = new WebClient(process.env.SLACK_BOT_TOKEN)
+const EMOJI = "ajay-pat";
+const invitePosts = new Set();
 
-app.command("/ping-dinos", async({command, ack}) => {
+app.command("/ping-dinos", async ({command, ack}) => {
     await ack();
-
-    const arg = command.text.trim().toLowerCase();
-    const text = "<@U0AK24A5EA2> get pung!!!";
-
-    await client.chat.postMessage({
+    const res = await client.chat.postMessage({
         channel: command.channel_id,
-        text,
-        link_names: true,
-        as_user: true,
+        text: `react with :${EMOJI}: to get added to this channel!`,
     });
+    invitePosts.add(res.ts);
+});
+
+app.event("reaction_added", async ({event}) => {
+    if (event.reaction !== EMOJI || !invitePosts.has(event.item.ts)) return;
+    try {
+        await client.conversations.invite({ channel: "C0B46AET9EV", users: event.user });
+    } catch (e) {
+        console.log("invite failed:", e.data?.error || e.message);
+    }
 });
 
 (async () => {
     await app.start();
-    console.log("bot is running!");
+    console.log("bot running");
 })();
+
