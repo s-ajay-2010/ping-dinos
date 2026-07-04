@@ -22,6 +22,15 @@ app.command("/ping-dinos", async ({command, ack}) => {
     invitePosts.add(res.ts);
 });
 
+
+app.command ("/ping-dinos-help", async ({command, ack}) => {
+    await ack;
+    const res = await client.chat.postMessage({
+        channel: command.channel_id,
+        text: "Commands in this bot: \n/ping-dinos-cat-facts - Show cat facts \n/ping-dinos-joke - to get a dino joke \n/ping-dinos-help - to show this help message"
+    })
+});
+
 app.event("reaction_added", async ({event}) => {
     if (event.reaction !== EMOJI || !invitePosts.has(event.item.ts)) return;
     try {
