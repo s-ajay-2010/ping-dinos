@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const {App} = require("@slack/bolt");
 const {WebClient} = require("@slack/web-api");
+const {axios} = require("axios");
 
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
@@ -22,10 +23,27 @@ app.command("/ping-dinos", async ({command, ack}) => {
     invitePosts.add(res.ts);
 });
 
+app.command("/ping-dinos-joke", async({ack, response}) => {
+    await ack();
+    try{
+        const res = await axios.get("https://official-joke-api.appspot.com/random_joke");
+        await response({
+            channel: command.channel_id,
+            text: `Dino-joke: ${res.data.setup} \n${res.data.punchline}`
+        })
+    }
+    catch(err){
+        await client.chat.postMessage({
+            channel: command.channel_id,
+            text: "Failed to fetch a joke:("
+        })
+    }
+});
+
 
 app.command ("/ping-dinos-help", async ({command, ack}) => {
-    await ack;
-    const res = await client.chat.postMessage({
+    await ack();
+    await client.chat.postMessage({
         channel: command.channel_id,
         text: "Commands in this bot: \n/ping-dinos-cat-facts - Show cat facts \n/ping-dinos-joke - to get a dino joke \n/ping-dinos-help - to show this help message"
     })
