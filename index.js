@@ -23,6 +23,26 @@ app.command("/ping-dinos", async ({command, ack}) => {
     invitePosts.add(res.ts);
 });
 
+app.command(".ping-dinos-cat-facts", async({ack, response}) => {
+    await ack();
+
+    try{
+        const res = await axios.get("https://catfact.ninja/fact");
+        await client.chat.postMessage({
+            channel: command.channel_id,
+            text: `Cat fact: ${response.data.fact}`
+        })
+    }
+    catch(err){
+        await client.chat.postMessage({
+            channel: command.channel_id,
+            text: "Failed to fetch cat fact:("
+        })
+    }
+
+
+});
+
 app.command("/ping-dinos-joke", async({ack, response}) => {
     await ack();
     try{
